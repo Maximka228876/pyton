@@ -157,11 +157,8 @@ async def list_reminders(callback: CallbackQuery):
 async def delete_reminder(callback: CallbackQuery):
     try:
         # Получаем ID напоминания из callback_data (формат: delete_123)
-        parts = callback.data.split("_")
-        if len(parts) != 2:
-            raise ValueError("Неверный формат команды")
-
-        reminder_id = int(parts[1])
+        _, reminder_id_str = callback.data.split("_")
+        reminder_id = int(reminder_id_str)
         user_id = callback.from_user.id
 
         # Удаление из PostgreSQL
@@ -185,13 +182,13 @@ async def delete_reminder(callback: CallbackQuery):
             ]
 
         await callback.message.answer("✅ Напоминание удалено!")
-    except (IndexError, ValueError) as e:
-        logger.error(f"Ошибка формата: {e}")
-        await callback.answer("⚠️ Неверный формат команды!")
+    except ValueError:
+        await callback.answer("⚠️ Ошибка формата команды!")
     except Exception as e:
         logger.error(f"Ошибка удаления: {e}")
-        await callback.message.answer("❌ Ошибка при удалении!")
-    await callback.answer()
+        await callback.answer("❌ Не удалось удалить!")
+    finally:
+        await callback.answer()
 
 
 async def send_reminder(user_id: int, text: str):
