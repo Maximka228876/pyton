@@ -21,6 +21,7 @@ async def feedback_menu(message: Message, state: FSMContext):
     )
     await state.set_state(Form.waiting_for_feedback)
 
+
 # Обработка отзыва
 @router.message(Form.waiting_for_feedback)
 async def process_feedback(message: Message, state: FSMContext):
@@ -30,13 +31,27 @@ async def process_feedback(message: Message, state: FSMContext):
 
     feedback_text = escape(message.text)
     user = message.from_user
-    success = False  # Упростили логику
+    success = False
+
+    # Формируем информацию о пользователе
+    user_info = []
+    if user.username:
+        user_info.append(f"@{user.username}")
+    if user.first_name:
+        user_info.append(user.first_name)
+    if user.last_name:
+        user_info.append(user.last_name)
+
+    # Если нет никаких данных, используем ID
+    if not user_info:
+        user_info.append(f"ID: {user.id}")
+
+    user_display = " ".join(user_info)
 
     try:
-        # Отправляем отзыв в указанный чат
         await bot.send_message(
             FEEDBACK_CHAT_ID,
-            f"📝 Отзыв от @{user.username}:\n{feedback_text}"
+            f"📝 Отзыв от {user_display}:\n{feedback_text}"
         )
         success = True
     except Exception as e:
