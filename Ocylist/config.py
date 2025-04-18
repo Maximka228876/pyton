@@ -1,13 +1,22 @@
 import os
 from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from dotenv import load_dotenv
 
 load_dotenv()
 
+# Инициализация бота и диспетчера
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
-scheduler = AsyncIOScheduler()
+
+# Инициализация планировщика с PostgreSQL
+jobstores = {
+    'default': SQLAlchemyJobStore(url=os.getenv("DATABASE_URL"))
+}
+scheduler = AsyncIOScheduler(jobstores=jobstores, timezone="UTC")
+
+# Локальный кэш напоминаний (добавлено)
 reminders = {}
 
 
