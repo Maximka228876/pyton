@@ -57,16 +57,13 @@ def get_delete_reminder_keyboard(user_id: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     user_reminders = reminders.get(user_id, [])
 
-    if not user_reminders:
-        builder.button(text="Нет напоминаний", callback_data="no_reminders")
-    else:
-        for idx, rem in enumerate(user_reminders):
-        
-            builder.button(
-            text=f"Удалить {idx + 1}: {rem['text']}",
-            callback_data=f"delete_{rem['id']}"  # rem["id"] должен быть числом
+    for rem in user_reminders:
+        # Используем ID напоминания из базы данных
+        builder.button(
+            text=f"❌ Удалить '{rem['text']}'",
+            callback_data=f"delete_{rem['id']}"
         )
-    
+
     builder.button(text="🔙 Назад", callback_data="back_main")
     builder.adjust(1)
     return builder.as_markup()
