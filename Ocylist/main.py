@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import datetime
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 from config import dp, bot, scheduler
@@ -23,6 +24,9 @@ async def on_startup():
     init_db()  # Инициализация БД
     await load_reminders_on_startup()
     logging.info("Напоминания загружены")
+    server_time = datetime.datetime.now()
+    logging.info(f"Текущее время сервера: {server_time}")
+    logging.info(f"Часовой пояс сервера: {server_time.astimezone().tzinfo}")
 
 async def main():
     # Настройка логирования
