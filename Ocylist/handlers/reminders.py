@@ -19,6 +19,41 @@ from states import Form
 router = Router()
 logger = logging.getLogger(__name__)
 
+
+async def load_reminders_on_startup():
+    """Загрузка напоминаний при старте"""
+    try:
+        # Очистка всех существующих заданий
+        scheduler.remove_all_jobs()
+
+        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM reminders WHERE active = TRUE")
+        reminders_data = cursor.fetchall()
+
+        for rem in reminders_data:
+            user_id = rem[1]
+            text = rem[2]
+            time_str = rem[3]
+            hour, minute = map(int, time_str.split(':'))
+
+            # Уникальный ID для задания
+            job_id = f"reminder_{user_id}_{rem[0]}"
+
+            scheduler.add_job(
+                send_reminder,
+                trigger='cron',
+                hour=hour,
+                minute=minute,
+                args=(user_id, text),
+                id=job_id
+            )
+
+        conn.close()
+        logger.info(f"Загружено {len(reminders_data)} напоминаний")
+    except Exception as e:
+        logger.error(f"Ошибка загрузки: {e}")
+
 # Меню напоминаний
 @router.message(F.text == "⏰ Напоминания")
 async def reminders_menu(message: Message):
@@ -175,30 +210,3 @@ async def cancel_action(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("❌ Действие отменено.", reply_markup=get_main_menu())
 
-async def load_reminders_on_startup():
-    """Загрузка напоминаний из PostgreSQL при старте бота"""
-    try:
-        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM reminders WHERE active = TRUE")
-        reminders_data = cursor.fetchall()
-
-        for rem in reminders_data:
-            user_id = rem[1]
-            text = rem[2]
-            time_str = rem[3]
-            hour, minute = map(int, time_str.split(':'))
-            
-            scheduler.add_job(
-                send_reminder,
-                trigger='cron',
-                hour=hour,
-                minute=minute,
-                args=(user_id, text),
-                id=f"reminder_{user_id}_{rem[0]}"
-            )
-        
-        conn.close()
-        logger.info(f"Загружено {len(reminders_data)} напоминаний")
-    except Exception as e:
-        logger.error(f"Ошибка загрузки: {e}")
