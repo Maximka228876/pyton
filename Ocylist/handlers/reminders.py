@@ -5,31 +5,18 @@ from datetime import datetime
 import logging
 import os
 import psycopg2
-from pytz import utc
 from html import escape
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-
+from config import bot, scheduler, reminders  # Импорт из общего конфига
 from keyboards.main import (
     get_reminders_menu,
     get_delete_reminder_keyboard,
     get_cancel_keyboard,
     get_main_menu
 )
-from config import bot, reminders
 from states import Form
 
 router = Router()
-
-# Исправлено: Инициализация планировщика с PostgreSQL
-jobstores = {
-    'default': SQLAlchemyJobStore(url=os.getenv("DATABASE_URL"))
-}
-scheduler = AsyncIOScheduler(jobstores=jobstores, timezone=utc)
-scheduler.start()
-
-# Добавлено: Логирование
 logger = logging.getLogger(__name__)
 
 
@@ -202,7 +189,6 @@ async def send_reminder(user_id: int, text: str):
         logger.info(f"Отправлено напоминание пользователю {user_id}")
     except Exception as e:
         logger.error(f"Ошибка отправки: {e}")
-
 
 @router.message(F.text == "❌ Отмена")
 async def cancel_action(message: Message, state: FSMContext):
