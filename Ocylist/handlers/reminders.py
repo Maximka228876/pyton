@@ -7,7 +7,7 @@ import os
 import psycopg2
 from html import escape
 
-from config import bot, scheduler, reminders  # Импорт из общего конфига
+from config import bot, scheduler, reminders
 from keyboards.main import (
     get_reminders_menu,
     get_delete_reminder_keyboard,
@@ -19,36 +19,7 @@ from states import Form
 router = Router()
 logger = logging.getLogger(__name__)
 
-
-async def load_reminders_on_startup():
-    """Загрузка напоминаний из PostgreSQL при старте"""
-    try:
-        conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM reminders WHERE active = TRUE")
-        reminders_data = cursor.fetchall()
-
-        for rem in reminders_data:
-            user_id = rem[1]
-            text = rem[2]
-            time_str = rem[3]
-            hour, minute = map(int, time_str.split(':'))
-
-            scheduler.add_job(
-                send_reminder,
-                trigger='cron',
-                hour=hour,
-                minute=minute,
-                args=(user_id, text),
-                id=f"reminder_{user_id}_{rem[0]}"
-            )
-
-        conn.close()
-        logger.info(f"Загружено {len(reminders_data)} напоминаний")
-    except Exception as e:
-        logger.error(f"Ошибка загрузки: {e}")
-
-
+# Меню напоминаний
 @router.message(F.text == "⏰ Напоминания")
 async def reminders_menu(message: Message):
     await message.answer(
@@ -56,7 +27,7 @@ async def reminders_menu(message: Message):
         reply_markup=get_reminders_menu()
     )
 
-
+# Добавление напоминания (шаг 1: текст)
 @router.callback_query(F.data == "add_reminder")
 async def add_reminder_start(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
@@ -66,7 +37,7 @@ async def add_reminder_start(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Form.waiting_for_reminder_text)
     await callback.answer()
 
-
+# Шаг 2: время
 @router.message(Form.waiting_for_reminder_text)
 async def process_reminder_text(message: Message, state: FSMContext):
     if message.text == "❌ Отмена":
@@ -80,7 +51,7 @@ async def process_reminder_text(message: Message, state: FSMContext):
     )
     await state.set_state(Form.waiting_for_reminder_time)
 
-
+# Сохранение напоминания
 @router.message(Form.waiting_for_reminder_time)
 async def process_reminder_time(message: Message, state: FSMContext):
     if message.text == "❌ Отмена":
@@ -92,7 +63,7 @@ async def process_reminder_time(message: Message, state: FSMContext):
         time = datetime.strptime(message.text, "%H:%M").time()
         user_id = message.from_user.id
 
-        # Исправлено: Работа с PostgreSQL вместо SQLite
+        # Сохраняем в PostgreSQL
         conn = psycopg2.connect(os.getenv("DATABASE_URL"))
         cursor = conn.cursor()
         cursor.execute(
@@ -103,7 +74,7 @@ async def process_reminder_time(message: Message, state: FSMContext):
         conn.commit()
         conn.close()
 
-        # Добавление в планировщик
+        # Добавляем в планировщик
         scheduler.add_job(
             send_reminder,
             trigger="cron",
@@ -113,7 +84,7 @@ async def process_reminder_time(message: Message, state: FSMContext):
             id=f"reminder_{user_id}_{reminder_id}"
         )
 
-        # Обновление локального кэша
+        # Обновляем локальный список
         if user_id not in reminders:
             reminders[user_id] = []
         reminders[user_id].append({
@@ -132,10 +103,10 @@ async def process_reminder_time(message: Message, state: FSMContext):
     except ValueError:
         await message.answer("❌ Неверный формат времени!")
     except Exception as e:
-        logger.error(f"Ошибка: {e}")
+        logger.error(f"Ошибка сохранения: {e}")
         await message.answer("❌ Ошибка при сохранении!")
 
-
+# Список напоминаний
 @router.callback_query(F.data == "list_reminders")
 async def list_reminders(callback: CallbackQuery):
     user_id = callback.from_user.id
@@ -152,11 +123,11 @@ async def list_reminders(callback: CallbackQuery):
         await callback.message.answer(text)
     await callback.answer()
 
-
+# Удаление напоминаний
 @router.callback_query(F.data.startswith("delete_"))
 async def delete_reminder(callback: CallbackQuery):
     try:
-        # Получаем ID напоминания из callback_data (формат: delete_123)
+        # Получаем ID напоминания
         _, reminder_id_str = callback.data.split("_")
         reminder_id = int(reminder_id_str)
         user_id = callback.from_user.id
@@ -174,7 +145,7 @@ async def delete_reminder(callback: CallbackQuery):
         # Удаление из планировщика
         scheduler.remove_job(f"reminder_{user_id}_{reminder_id}")
 
-        # Удаление из локального кэша
+        # Обновление локального кэша
         if user_id in reminders:
             reminders[user_id] = [
                 rem for rem in reminders[user_id]
@@ -182,24 +153,23 @@ async def delete_reminder(callback: CallbackQuery):
             ]
 
         await callback.message.answer("✅ Напоминание удалено!")
-    except ValueError:
-        await callback.answer("⚠️ Ошибка формата команды!")
+    except (ValueError, IndexError):
+        await callback.answer("⚠️ Неверный формат команды!")
     except Exception as e:
         logger.error(f"Ошибка удаления: {e}")
-        await callback.answer("❌ Не удалось удалить!")
+        await callback.answer("❌ Ошибка при удалении!")
     finally:
         await callback.answer()
 
-
+# Отправка уведомления
 async def send_reminder(user_id: int, text: str):
     try:
         await bot.send_message(user_id, f"🔔 Напоминание: {text}")
-        logger.info(f"Успешно отправлено: {user_id}")
+        logger.info(f"Отправлено напоминание пользователю {user_id}")
     except Exception as e:
-        logger.error(f"Ошибка: {e}")
-        # Перезагрузите напоминания при ошибке
-        await load_reminders_on_startup()
+        logger.error(f"Ошибка отправки: {e}")
 
+# Общая отмена
 @router.message(F.text == "❌ Отмена")
 async def cancel_action(message: Message, state: FSMContext):
     await state.clear()
