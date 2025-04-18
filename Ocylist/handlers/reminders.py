@@ -12,9 +12,48 @@ from config import bot, scheduler, reminders
 from states import Form
 import sqlite3
 from html import escape
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+import psycopg2
+import os
 
 router = Router()
 
+jobstores = {
+    'default': SQLAlchemyJobStore(url=os.getenv("DATABASE_URL"))
+}
+scheduler = AsyncIOScheduler(jobstores=jobstores)
+scheduler.start()
+
+
+# При старте бота загружаем напоминания из БД
+async def load_reminders_on_startup():
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM reminders WHERE active = TRUE")
+    reminders = cursor.fetchall()
+
+    for rem in reminders:
+        user_id = rem[1]
+        text = rem[2]
+        time = rem[3]
+        hour, minute = map(int, time.split(':'))
+
+        scheduler.add_job(
+            send_reminder,
+            trigger='cron',
+            hour=hour,
+            minute=minute,
+            args=(user_id, text),
+            id=f"reminder_{user_id}_{rem[0]}"
+        )
+
+    conn.close()
+
+
+# Добавьте вызов в main.py
+async def main():
+    await load_reminders_on_startup()
 
 # Меню напоминаний
 @router.message(F.text == "⏰ Напоминания")
