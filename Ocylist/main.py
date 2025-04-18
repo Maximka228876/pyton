@@ -4,8 +4,9 @@ from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 from config import dp, bot, scheduler
 from handlers.reminders import load_reminders_on_startup
+from database.db import init_db  # Добавлен импорт
 
-# Импорт роутеров (ваши роутеры здесь)
+# Импорт роутеров
 from handlers.start import router as start_router
 from handlers.vision import router as vision_router
 from handlers.reminders import router as reminders_router
@@ -18,10 +19,18 @@ from handlers.help import router as help_router
 load_dotenv()
 
 async def on_startup():
+    """Действия при запуске бота"""
+    init_db()  # Инициализация БД
     await load_reminders_on_startup()
     logging.info("Напоминания загружены")
 
 async def main():
+    # Настройка логирования
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
     # Регистрация роутеров
     dp.include_router(start_router)
     dp.include_router(vision_router)
@@ -32,22 +41,16 @@ async def main():
     dp.include_router(tips_router)
     dp.include_router(help_router)
 
-    # Настройка логирования
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-
-    # Запуск планировщика (только если он не активен)
+    # Запуск планировщика
     if not scheduler.running:
         scheduler.start()
         logging.info("Планировщик запущен")
-    await load_reminders_on_startup()
-    await dp.start_polling(bot)
+
     # Стартовые задачи
     await on_startup()
 
     # Запуск бота
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())
