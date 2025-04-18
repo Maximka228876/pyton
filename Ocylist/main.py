@@ -1,11 +1,10 @@
 import asyncio
 import logging
-import datetime
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 from config import dp, bot, scheduler
+from database.db import init_db
 from handlers.reminders import load_reminders_on_startup
-from database.db import init_db  # Добавлен импорт
 
 # Импорт роутеров
 from handlers.start import router as start_router
@@ -20,13 +19,9 @@ from handlers.help import router as help_router
 load_dotenv()
 
 async def on_startup():
-    """Действия при запуске бота"""
-    init_db()  # Инициализация БД
-    await load_reminders_on_startup()
-    logging.info("Напоминания загружены")
-    server_time = datetime.datetime.now()
-    logging.info(f"Текущее время сервера: {server_time}")
-    logging.info(f"Часовой пояс сервера: {server_time.astimezone().tzinfo}")
+    init_db()  # Создание таблиц
+    await load_reminders_on_startup()  # Загрузка напоминаний
+    logging.info("Бот запущен")
 
 async def main():
     # Настройка логирования
