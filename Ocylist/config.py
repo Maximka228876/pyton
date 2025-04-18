@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from dotenv import load_dotenv
+from pytz import timezone
 
 load_dotenv()
 
@@ -14,7 +15,11 @@ dp = Dispatcher()
 jobstores = {
     'default': SQLAlchemyJobStore(url=os.getenv("DATABASE_URL"))
 }
-scheduler = AsyncIOScheduler(jobstores=jobstores, timezone="UTC")
+
+scheduler = AsyncIOScheduler(
+    jobstores=jobstores,
+    timezone=timezone("Asia/Yakutsk")  # Замените на ваш часовой пояс
+)
 
 # Локальный кэш напоминаний (добавлено)
 reminders = {}
