@@ -155,28 +155,34 @@ async def list_reminders(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("delete_"))
 async def delete_reminder(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    idx = int(callback.data.split("_")[1])
-
-    if user_id not in reminders or idx >= len(reminders[user_id]):
-        await callback.answer("⚠️ Напоминание не найдено!")
-        return
-
     try:
-        reminder = reminders[user_id].pop(idx)
+        # Получаем ID напоминания из callback.data (формат: delete_123)
+        reminder_id = int(callback.data.split("_")[1])
+        user_id = callback.from_user.id
 
-        # Исправлено: Удаление из PostgreSQL
+        # Удаление из PostgreSQL
         conn = psycopg2.connect(os.getenv("DATABASE_URL"))
         cursor = conn.cursor()
         cursor.execute(
             "DELETE FROM reminders WHERE id = %s AND user_id = %s",
-            (reminder["id"], user_id)
+            (reminder_id, user_id)
         )
         conn.commit()
         conn.close()
 
-        scheduler.remove_job(f"reminder_{user_id}_{reminder['id']}")
+        # Удаление из планировщика
+        scheduler.remove_job(f"reminder_{user_id}_{reminder_id}")
+
+        # Удаление из локального кэша
+        if user_id in reminders:
+            reminders[user_id] = [
+                rem for rem in reminders[user_id]
+                if rem["id"] != reminder_id
+            ]
+
         await callback.message.answer("✅ Напоминание удалено!")
+    except (IndexError, ValueError):
+        await callback.answer("⚠️ Неверный формат команды!")
     except Exception as e:
         logger.error(f"Ошибка удаления: {e}")
         await callback.message.answer("❌ Ошибка при удалении!")
