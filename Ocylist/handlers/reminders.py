@@ -156,8 +156,12 @@ async def list_reminders(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("delete_"))
 async def delete_reminder(callback: CallbackQuery):
     try:
-        # Получаем ID напоминания из callback.data (формат: delete_123)
-        reminder_id = int(callback.data.split("_")[1])
+        # Получаем ID напоминания из callback_data (формат: delete_123)
+        parts = callback.data.split("_")
+        if len(parts) != 2:
+            raise ValueError("Неверный формат команды")
+
+        reminder_id = int(parts[1])
         user_id = callback.from_user.id
 
         # Удаление из PostgreSQL
@@ -181,7 +185,8 @@ async def delete_reminder(callback: CallbackQuery):
             ]
 
         await callback.message.answer("✅ Напоминание удалено!")
-    except (IndexError, ValueError):
+    except (IndexError, ValueError) as e:
+        logger.error(f"Ошибка формата: {e}")
         await callback.answer("⚠️ Неверный формат команды!")
     except Exception as e:
         logger.error(f"Ошибка удаления: {e}")
@@ -192,9 +197,11 @@ async def delete_reminder(callback: CallbackQuery):
 async def send_reminder(user_id: int, text: str):
     try:
         await bot.send_message(user_id, f"🔔 Напоминание: {text}")
-        logger.info(f"Отправлено напоминание пользователю {user_id}")
+        logger.info(f"Успешно отправлено: {user_id}")
     except Exception as e:
-        logger.error(f"Ошибка отправки: {e}")
+        logger.error(f"Ошибка: {e}")
+        # Перезагрузите напоминания при ошибке
+        await load_reminders_on_startup()
 
 @router.message(F.text == "❌ Отмена")
 async def cancel_action(message: Message, state: FSMContext):
