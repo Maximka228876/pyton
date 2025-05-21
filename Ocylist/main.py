@@ -4,9 +4,9 @@ from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 from config import dp, bot, scheduler
 from database.db import init_db
-from handlers.reminders import load_reminders_on_startup
 
 # Импорт роутеров
+from handlers.diseases import router as diseases_router
 from handlers.start import router as start_router
 from handlers.vision import router as vision_router
 from handlers.feedback import router as feedback_router
@@ -30,6 +30,7 @@ async def main():
     )
 
     # Регистрация роутеров
+    dp.include_router(diseases_router)
     dp.include_router(start_router)
     dp.include_router(vision_router)
     dp.include_router(feedback_router)
