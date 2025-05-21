@@ -207,7 +207,7 @@ async def show_disease_info(callback: CallbackQuery):
 async def back_to_diseases_menu(callback: CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(
-        "📚 Выберите заболевание:",
-        reply_markup=get_diseases_menu()
+        "Главное меню:",
+        reply_markup=get_main_menu()
     )
     await callback.answer()
