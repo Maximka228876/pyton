@@ -8,17 +8,7 @@ def init_db():
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
-
-    # Создание таблицы reminders
-    cursor.execute('''
-            CREATE TABLE IF NOT EXISTS reminders (
-                id SERIAL PRIMARY KEY,
-                user_id BIGINT NOT NULL,
-                text TEXT NOT NULL,
-                time TEXT NOT NULL,
-                active BOOLEAN DEFAULT TRUE
-            )
-        ''')
+    
     
     # Создание таблиц
     cursor.execute('''
