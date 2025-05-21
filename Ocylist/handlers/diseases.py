@@ -4,13 +4,7 @@ from keyboards.main import get_diseases_menu, get_back_to_diseases_keyboard
 import logging
 
 router = Router()
-
 logger = logging.getLogger(__name__)
-
-@router.message(F.text == "🤒 Заболевания")
-async def diseases_menu(message: Message):
-    logger.info("Кнопка 'Заболевания' нажата!")
-    
 
 DISEASES_INFO = {
     "myopia": {
@@ -23,8 +17,9 @@ DISEASES_INFO = {
     }
 }
 
-@router.message(F.text == "🤒 Заболевания")  # Важно: текст кнопки должен совпадать с главным меню!
+@router.message(F.text == "🤒 Заболевания")
 async def diseases_menu(message: Message):
+    logger.info("Кнопка 'Заболевания' нажата!")
     await message.answer(
         "📚 Выберите заболевание:", 
         reply_markup=get_diseases_menu()
