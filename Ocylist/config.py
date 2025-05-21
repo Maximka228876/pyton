@@ -21,9 +21,6 @@ scheduler = AsyncIOScheduler(
     timezone=timezone("Asia/Yakutsk")  # Замените на ваш часовой пояс
 )
 
-# Локальный кэш напоминаний (добавлено)
-reminders = {}
-
 
 SIVTSEV_IMAGES = {
     1: "sivtsev_1.jpg",
