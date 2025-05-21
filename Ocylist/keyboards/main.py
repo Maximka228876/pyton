@@ -40,17 +40,32 @@ def get_cancel_keyboard() -> ReplyKeyboardMarkup:
 
 # Заболевания
 
-# Уберите ВСЕ упоминания reminders и добавьте:
-
 def get_diseases_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
+    
     builder.row(
         InlineKeyboardButton(text="Близорукость", callback_data="disease_myopia"),
-        InlineKeyboardButton(text="Катаракта", callback_data="disease_cataract"),
+        InlineKeyboardButton(text="Дальнозоркость", callback_data="disease_hyperopia"),
     )
+    
     builder.row(
-        InlineKeyboardButton(text="🔙 Назад", callback_data="back_main"),
+        InlineKeyboardButton(text="Катаракта", callback_data="disease_cataract"),
+        InlineKeyboardButton(text="Глаукома", callback_data="disease_glaucoma"),
     )
+    
+    builder.row(
+        InlineKeyboardButton(text="Конъюнктивит", callback_data="disease_conjunctivitis"),
+        InlineKeyboardButton(text="Астигматизм", callback_data="disease_astigmatism"),
+    )
+    
+    builder.row(
+        InlineKeyboardButton(text="Дальтонизм", callback_data="disease_colorblindness"),
+    )
+    
+    builder.row(
+        InlineKeyboardButton(text="🔙 Назад", callback_data="back_diseases"),
+    )
+    
     return builder.as_markup()
 
 def get_back_to_diseases_keyboard() -> InlineKeyboardMarkup:
