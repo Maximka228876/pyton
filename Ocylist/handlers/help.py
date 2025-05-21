@@ -18,7 +18,7 @@ async def help_command(message: Message):
     await message.answer(
         HELP_TEXT,
         parse_mode="HTML",
-        reply_markup=get_help_menu()  # Кнопка "Назад"
+        reply_markup=get_help_menu()
     )
 
 @router.callback_query(F.data == "back_main")
