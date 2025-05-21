@@ -13,7 +13,6 @@ import os
 
 router = Router()
 
-# Обработчик кнопки "Проверить зрение"
 @router.message(F.text == "👁️ Проверить зрение")
 async def vision_tests(message: types.Message):
     await message.answer(
@@ -21,7 +20,7 @@ async def vision_tests(message: types.Message):
         "1. Тест на четкость зрения\n"
         "2. Тест на цветовосприятие\n"
         "3. Тест на астигматизм",
-        reply_markup=get_vision_test_menu()  # Убедитесь, что эта функция существует
+        reply_markup=get_vision_test_menu()
     )
 
 
@@ -51,11 +50,9 @@ async def process_test_answer(message: types.Message, state: FSMContext):
     step = data["current_test_step"]
     correct_answers = SIVTSEV_ANSWERS.get(step, [])
 
-    # Проверяем ответ
     user_answers = [x.upper().strip() for x in message.text.split()]
     is_correct = set(user_answers) == set(correct_answers)
 
-    # Обновляем данные
     new_correct = data["correct_answers"] + (1 if is_correct else 0)
     await state.update_data(
         current_test_step=step + 1,
@@ -63,7 +60,6 @@ async def process_test_answer(message: types.Message, state: FSMContext):
         **{f"step_{step}": is_correct}
     )
 
-    # Переходим к следующему шагу или завершаем
     if step + 1 > data["total_questions"]:
         await _finish_test(message, state)
     else:
@@ -103,7 +99,6 @@ async def _finish_test(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-# ----- Тест на цветовосприятие -----
 @router.callback_query(F.data == "test_color")
 async def start_color_test(callback: CallbackQuery, state: FSMContext):
     await state.update_data(
@@ -132,11 +127,9 @@ async def process_color_answer(message: types.Message, state: FSMContext):
     step = data["current_test_step"]
     correct = COLOR_ANSWERS.get(step, [])
 
-    # Проверка ответа
     user_answer = message.text.strip()
     is_correct = user_answer in correct
 
-    # Обновляем данные
     new_correct = data["correct_answers"] + (1 if is_correct else 0)
     await state.update_data(
         current_test_step=step + 1,
@@ -178,7 +171,6 @@ async def _finish_color_test(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-# ----- Тест на астигматизм -----
 @router.callback_query(F.data == "test_astigmatism")
 async def start_astigmatism_test(callback: CallbackQuery, state: FSMContext):
     await state.update_data(
@@ -208,11 +200,9 @@ async def process_astigmatism_answer(message: types.Message, state: FSMContext):
     step = data["current_test_step"]
     correct = ASTIGMATISM_ANSWERS.get(step, [])
 
-    # Проверка ответа (регистр не важен)
     user_answer = message.text.strip().lower()
     is_correct = any(user_answer == ans.lower() for ans in correct)
 
-    # Обновляем данные
     new_correct = data["correct_answers"] + (1 if is_correct else 0)
     await state.update_data(
         current_test_step=step + 1,
@@ -254,7 +244,6 @@ async def _finish_astigmatism_test(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-# Общий обработчик отмены
 @router.message(F.text == "❌ Отмена")
 async def cancel_action(message: types.Message, state: FSMContext):
     await state.clear()
