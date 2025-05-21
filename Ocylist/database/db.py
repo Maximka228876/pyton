@@ -20,15 +20,5 @@ def init_db():
             reg_date TEXT
         )
     ''')
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reminders (
-            id SERIAL PRIMARY KEY,
-            user_id BIGINT,
-            text TEXT,
-            time TEXT,
-            active BOOLEAN
-        )
-    ''')
     conn.commit()
     conn.close()
