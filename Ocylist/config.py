@@ -7,18 +7,16 @@ from pytz import timezone
 
 load_dotenv()
 
-# Инициализация бота и диспетчера
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
 
-# Инициализация планировщика с PostgreSQL
 jobstores = {
     'default': SQLAlchemyJobStore(url=os.getenv("DATABASE_URL"))
 }
 
 scheduler = AsyncIOScheduler(
     jobstores=jobstores,
-    timezone=timezone("Asia/Yakutsk")  # Замените на ваш часовой пояс
+    timezone=timezone("Asia/Yakutsk")
 )
 
 
@@ -110,4 +108,3 @@ HEALTH_TIPS = {
         "🧼 <b>Гигиена</b>\nНе трогайте глаза грязными руками. Для снятия макияжа используйте мицеллярную воду."
     ]
 }
-
