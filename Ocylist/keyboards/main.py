@@ -2,7 +2,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, KeyboardButton, InlineKeyboardButton
 
 
-# Главное меню (крупные кнопки)
+# Главное меню
 def get_main_menu() -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     buttons = [
@@ -39,7 +39,6 @@ def get_cancel_keyboard() -> ReplyKeyboardMarkup:
 
 
 # Заболевания
-
 def get_diseases_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     
@@ -76,7 +75,6 @@ def get_back_to_diseases_keyboard() -> InlineKeyboardMarkup:
 
 
 # Кнопка назад запись к врачу
-
 def get_clinics_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
@@ -85,7 +83,6 @@ def get_clinics_menu() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 # Советы
-
 def get_health_tips_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
@@ -104,7 +101,6 @@ def get_back_to_tips_keyboard() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 # Помощь
-
 def get_help_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
