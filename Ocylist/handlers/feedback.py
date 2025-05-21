@@ -9,10 +9,8 @@ import logging
 
 router = Router()
 
-# ID чата, куда отправляются отзывы
-FEEDBACK_CHAT_ID = -1002523164911  # Именно этот ID из вашего JSON
+FEEDBACK_CHAT_ID = -1002523164911
 
-# Запуск ввода отзыва
 @router.message(F.text == "📝 Оставить отзыв")
 async def feedback_menu(message: Message, state: FSMContext):
     await message.answer(
@@ -33,7 +31,6 @@ async def process_feedback(message: Message, state: FSMContext):
     user = message.from_user
     success = False
 
-    # Формируем информацию о пользователе
     user_info = []
     if user.username:
         user_info.append(f"@{user.username}")
@@ -42,7 +39,6 @@ async def process_feedback(message: Message, state: FSMContext):
     if user.last_name:
         user_info.append(user.last_name)
 
-    # Если нет никаких данных, используем ID
     if not user_info:
         user_info.append(f"ID: {user.id}")
 
@@ -66,7 +62,6 @@ async def process_feedback(message: Message, state: FSMContext):
         )
     await state.clear()
 
-# Обработчик отмены
 @router.message(F.text == "❌ Отмена")
 async def cancel_action(message: Message, state: FSMContext):
     await state.clear()
