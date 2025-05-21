@@ -63,7 +63,7 @@ def get_diseases_menu() -> InlineKeyboardMarkup:
     )
     
     builder.row(
-        InlineKeyboardButton(text="🔙 Назад", callback_data="back_diseases"),
+        InlineKeyboardButton(text="🔙 Назад", callback_data="back_main"),
     )
     
     return builder.as_markup()
