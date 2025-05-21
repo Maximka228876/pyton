@@ -206,7 +206,7 @@ async def show_disease_info(callback: CallbackQuery):
 @router.callback_query(F.data == "back_diseases")
 async def back_to_tips_menu(callback: CallbackQuery):
     await callback.message.edit_text(  
-        "📚 <b>Выберите заболевание:</b>",
+        "📚 Выберите заболевание:",
         parse_mode="HTML",
         reply_markup=get_diseases_menu()
     )
