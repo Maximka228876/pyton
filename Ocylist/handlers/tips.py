@@ -21,7 +21,7 @@ async def send_tips(callback: CallbackQuery):
     tips = HEALTH_TIPS.get(category, [])
 
     text = f"🔍 <b>Советы ({category.capitalize()}):</b>\n\n" + "\n\n".join(tips)
-    await callback.message.edit_text(  # Редактируем сообщение вместо отправки нового
+    await callback.message.edit_text(
         text,
         parse_mode="HTML",
         reply_markup=get_back_to_tips_keyboard()
@@ -31,8 +31,8 @@ async def send_tips(callback: CallbackQuery):
 
 @router.callback_query(F.data == "back_tips")
 async def back_to_tips_menu(callback: CallbackQuery):
-    await callback.message.edit_text(  # Редактируем текущее сообщение
-        "📚 <b>Выберите категорию советов:</b>",
+    await callback.message.edit_text(
+        "📚 Выберите категорию советов:",
         parse_mode="HTML",
         reply_markup=get_health_tips_menu()
     )
