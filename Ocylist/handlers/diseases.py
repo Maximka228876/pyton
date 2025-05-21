@@ -204,10 +204,10 @@ async def show_disease_info(callback: CallbackQuery):
     await callback.answer()
 
 @router.callback_query(F.data == "back_diseases")
-async def back_to_diseases_menu(callback: CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer(
-        "Главное меню:",
-        reply_markup=get_main_menu()
+async def back_to_tips_menu(callback: CallbackQuery):
+    await callback.message.edit_text(  
+        "📚 <b>Выберите заболевание:</b>",
+        parse_mode="HTML",
+        reply_markup=get_diseases_menu()
     )
     await callback.answer()
