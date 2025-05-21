@@ -3,13 +3,14 @@ from aiogram.types import Message, CallbackQuery
 from keyboards.main import get_diseases_menu, get_back_to_diseases_keyboard
 import logging
 
+router = Router()
+
 logger = logging.getLogger(__name__)
 
 @router.message(F.text == "🤒 Заболевания")
 async def diseases_menu(message: Message):
     logger.info("Кнопка 'Заболевания' нажата!")
     
-router = Router()
 
 DISEASES_INFO = {
     "myopia": {
