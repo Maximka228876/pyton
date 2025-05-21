@@ -9,7 +9,7 @@ def get_main_menu() -> ReplyKeyboardMarkup:
     buttons = [
         "👁️ Проверить зрение",
         "💡 Советы",
-        "⏰ Напоминания",
+        "🤒 Заболевания",
         "🏥 Запись к врачу",
         "❓ Помощь",
         "📝 Оставить отзыв"
@@ -38,35 +38,25 @@ def get_cancel_keyboard() -> ReplyKeyboardMarkup:
     builder.button(text="❌ Отмена")
     return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
 
-# Меню напоминаний
 
-def get_reminders_menu() -> InlineKeyboardMarkup:
+# Заболевания
+
+def get_diseases_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text="Добавить", callback_data="add_reminder"),
-        InlineKeyboardButton(text="Мои напоминания", callback_data="list_reminders"),
+        InlineKeyboardButton(text="Близорукость", callback_data="disease_myopia"),
+        InlineKeyboardButton(text="Катаракта", callback_data="disease_cataract"),
     )
     builder.row(
-        InlineKeyboardButton(text="Удалить", callback_data="delete_reminder"),
         InlineKeyboardButton(text="🔙 Назад", callback_data="back_main"),
     )
     return builder.as_markup()
 
-
-def get_delete_reminder_keyboard(user_id: int) -> InlineKeyboardMarkup:
+def get_back_to_diseases_keyboard() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    user_reminders = reminders.get(user_id, [])
-
-    for rem in user_reminders:
-        # Используем ID напоминания из базы данных
-        builder.button(
-            text=f"❌ Удалить '{rem['text']}'",
-            callback_data=f"delete_{rem['id']}"
-        )
-
-    builder.button(text="🔙 Назад", callback_data="back_main")
-    builder.adjust(1)
+    builder.button(text="🔙 К списку заболеваний", callback_data="back_diseases")
     return builder.as_markup()
+
 
 
 # Кнопка назад запись к врачу
