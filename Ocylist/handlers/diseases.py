@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@router.message(F.text == "👁️ Заболевания")
+@router.message(F.text == "🤒 Заболевания")
 async def diseases_menu(message: Message):
     logger.info("Кнопка 'Заболевания' нажата!")
     
@@ -22,7 +22,7 @@ DISEASES_INFO = {
     }
 }
 
-@router.message(F.text == "👁️ Заболевания")  # Важно: текст кнопки должен совпадать с главным меню!
+@router.message(F.text == "🤒 Заболевания")  # Важно: текст кнопки должен совпадать с главным меню!
 async def diseases_menu(message: Message):
     await message.answer(
         "📚 Выберите заболевание:", 
