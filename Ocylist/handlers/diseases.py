@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from keyboards.main import get_diseases_menu, get_back_to_diseases_keyboard
 import logging
+import time
 
 router = Router()
 logger = logging.getLogger(__name__)
@@ -204,8 +205,9 @@ async def show_disease_info(callback: CallbackQuery):
 
 @router.callback_query(F.data == "back_diseases")
 async def back_to_diseases_menu(callback: CallbackQuery):
+    # Добавляем временную метку в текст, чтобы избежать ошибки "message not modified"
     await callback.message.edit_text(
-        "📚 Выберите заболевание:",
+        f"📚 Выберите заболевание:\n<!-- {time.time()} -->",
         reply_markup=get_diseases_menu()
     )
     await callback.answer()
