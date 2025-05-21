@@ -205,9 +205,9 @@ async def show_disease_info(callback: CallbackQuery):
 
 @router.callback_query(F.data == "back_diseases")
 async def back_to_diseases_menu(callback: CallbackQuery):
-    # Добавляем временную метку в текст, чтобы избежать ошибки "message not modified"
-    await callback.message.edit_text(
-        f"📚 Выберите заболевание:\n<!-- {time.time()} -->",
+    await callback.message.delete()
+    await callback.message.answer(
+        "📚 Выберите заболевание:",
         reply_markup=get_diseases_menu()
     )
     await callback.answer()
