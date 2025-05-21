@@ -19,7 +19,6 @@ load_dotenv()
 
 async def on_startup():
     init_db()  # Создание таблиц
-    await load_reminders_on_startup()  # Загрузка напоминаний
     logging.info("Бот запущен")
 
 async def main():
