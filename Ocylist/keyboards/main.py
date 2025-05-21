@@ -43,22 +43,22 @@ def get_diseases_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     
     builder.row(
-        InlineKeyboardButton(text="Близорукость", callback_data="disease_myopia"),
-        InlineKeyboardButton(text="Дальнозоркость", callback_data="disease_hyperopia"),
+        InlineKeyboardButton(text="🔍 Близорукость", callback_data="disease_myopia"),
+        InlineKeyboardButton(text="🌀 Дальнозоркость", callback_data="disease_hyperopia"),
     )
     
     builder.row(
-        InlineKeyboardButton(text="Катаракта", callback_data="disease_cataract"),
-        InlineKeyboardButton(text="Глаукома", callback_data="disease_glaucoma"),
+        InlineKeyboardButton(text="⚪️ Катаракта", callback_data="disease_cataract"),
+        InlineKeyboardButton(text="🟢 Глаукома", callback_data="disease_glaucoma"),
     )
     
     builder.row(
-        InlineKeyboardButton(text="Конъюнктивит", callback_data="disease_conjunctivitis"),
-        InlineKeyboardButton(text="Астигматизм", callback_data="disease_astigmatism"),
+        InlineKeyboardButton(text="👁️ Конъюнктивит", callback_data="disease_conjunctivitis"),
+        InlineKeyboardButton(text="🌀 Астигматизм", callback_data="disease_astigmatism"),
     )
     
     builder.row(
-        InlineKeyboardButton(text="Дальтонизм", callback_data="disease_colorblindness"),
+        InlineKeyboardButton(text="🎨 Дальтонизм", callback_data="disease_colorblindness"),
     )
     
     builder.row(
@@ -86,11 +86,11 @@ def get_clinics_menu() -> InlineKeyboardMarkup:
 def get_health_tips_menu() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.row(
-        InlineKeyboardButton(text="Упражнения 🧘", callback_data="tips_exercises"),
-        InlineKeyboardButton(text="Питание 🥗", callback_data="tips_nutrition"),
+        InlineKeyboardButton(text="🧘 Упражнения", callback_data="tips_exercises"),
+        InlineKeyboardButton(text="🥗 Питание", callback_data="tips_nutrition"),
     )
     builder.row(
-        InlineKeyboardButton(text="Профилактика 🛡️", callback_data="tips_prevention"),
+        InlineKeyboardButton(text="🛡️Профилактика", callback_data="tips_prevention"),
         InlineKeyboardButton(text="🔙 Назад", callback_data="back_main"),
     )
     return builder.as_markup()
