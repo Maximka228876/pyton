@@ -9,7 +9,6 @@ from handlers.reminders import load_reminders_on_startup
 # Импорт роутеров
 from handlers.start import router as start_router
 from handlers.vision import router as vision_router
-from handlers.reminders import router as reminders_router
 from handlers.feedback import router as feedback_router
 from handlers.common import router as common_router
 from handlers.clinics import router as clinics_router
@@ -33,7 +32,6 @@ async def main():
     # Регистрация роутеров
     dp.include_router(start_router)
     dp.include_router(vision_router)
-    dp.include_router(reminders_router)
     dp.include_router(feedback_router)
     dp.include_router(common_router)
     dp.include_router(clinics_router)
