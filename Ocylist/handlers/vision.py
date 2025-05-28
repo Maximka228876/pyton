@@ -41,7 +41,6 @@ async def start_sivtsev_test(callback: CallbackQuery, state: FSMContext):
 
 @router.message(Form.vision_test)
 async def process_test_answer(message: types.Message, state: FSMContext):
-    # Если пользователь отменил тест
     if message.text == "❌ Отмена":
         await cancel_action(message, state)
         return
@@ -85,7 +84,6 @@ async def _finish_test(message: types.Message, state: FSMContext):
     correct = data["correct_answers"]
     total = data["total_questions"]
 
-    # Формируем результат
     result_text = "📊 Результаты:\n"
     for step in range(1, 6):
         result_text += f"Строка {step}: {'✅' if data.get(f'step_{step}') else '❌'}\n"
