@@ -15,7 +15,7 @@ def get_main_menu() -> ReplyKeyboardMarkup:
     ]
     for btn in buttons:
         builder.button(text=btn)
-    builder.adjust(2, 2, 2)  # 2 кнопки в строке
+    builder.adjust(2, 2, 2)
     return builder.as_markup(resize_keyboard=True)
 
 # Меню тестов зрения
